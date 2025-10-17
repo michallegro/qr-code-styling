@@ -22,7 +22,20 @@ module.exports = (env, argv) => {
       output: {
         ...config.output,
         filename: "qr-code-styling.common.js",
-        libraryTarget: "commonjs"
+        libraryTarget: "commonjs",
+        library: undefined // Remove library name for CommonJS
+      }
+    },
+    {
+      ...config,
+      output: {
+        ...config.output,
+        filename: "qr-code-styling.esm.js",
+        libraryTarget: "module",
+        library: undefined // Remove library name for ES modules
+      },
+      experiments: {
+        outputModule: true
       }
     }
   ];
