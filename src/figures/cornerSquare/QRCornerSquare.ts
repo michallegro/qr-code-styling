@@ -1,18 +1,15 @@
 import cornerSquareTypes from "../../constants/cornerSquareTypes";
-import { CornerSquareType, DrawArgs, BasicFigureDrawArgs, RotateFigureArgs, Window } from "../../types";
+import { CornerSquareType, DrawArgs, BasicFigureDrawArgs, Window } from "../../types";
+import QRFigureBase from "../QRFigureBase";
 
 export const availableCornerSquareTypes = Object.values(cornerSquareTypes);
 
-export default class QRCornerSquare {
-  _element?: SVGElement;
-  _svg: SVGElement;
+export default class QRCornerSquare extends QRFigureBase {
   _type: CornerSquareType;
-  _window: Window;
 
   constructor({ svg, type, window }: { svg: SVGElement; type: CornerSquareType; window: Window }) {
-    this._svg = svg;
+    super(svg, window);
     this._type = type;
-    this._window = window;
   }
 
   draw(x: number, y: number, size: number, rotation: number): void {
@@ -34,14 +31,7 @@ export default class QRCornerSquare {
     drawFunction.call(this, { x, y, size, rotation });
   }
 
-  _rotateFigure({ x, y, size, rotation = 0, draw }: RotateFigureArgs): void {
-    const cx = x + size / 2;
-    const cy = y + size / 2;
-
-    draw();
-    this._element?.setAttribute("transform", `rotate(${(180 * rotation) / Math.PI},${cx},${cy})`);
-  }
-
+  // Override the base _basicDot to create a ring shape for corner squares
   _basicDot(args: BasicFigureDrawArgs): void {
     const { size, x, y } = args;
     const dotSize = size / 7;
@@ -49,8 +39,7 @@ export default class QRCornerSquare {
     this._rotateFigure({
       ...args,
       draw: () => {
-        this._element = this._window.document.createElementNS("http://www.w3.org/2000/svg", "path");
-        this._element.setAttribute("clip-rule", "evenodd");
+        this._element = this._createPath();
         this._element.setAttribute(
           "d",
           `M ${x + size / 2} ${y}` + // M cx, y //  Move to top of ring
@@ -64,6 +53,7 @@ export default class QRCornerSquare {
     });
   }
 
+  // Override the base _basicSquare to create a ring shape for corner squares
   _basicSquare(args: BasicFigureDrawArgs): void {
     const { size, x, y } = args;
     const dotSize = size / 7;
@@ -71,8 +61,7 @@ export default class QRCornerSquare {
     this._rotateFigure({
       ...args,
       draw: () => {
-        this._element = this._window.document.createElementNS("http://www.w3.org/2000/svg", "path");
-        this._element.setAttribute("clip-rule", "evenodd");
+        this._element = this._createPath();
         this._element.setAttribute(
           "d",
           `M ${x} ${y}` +
@@ -97,8 +86,7 @@ export default class QRCornerSquare {
     this._rotateFigure({
       ...args,
       draw: () => {
-        this._element = this._window.document.createElementNS("http://www.w3.org/2000/svg", "path");
-        this._element.setAttribute("clip-rule", "evenodd");
+        this._element = this._createPath();
         this._element.setAttribute(
           "d",
           `M ${x} ${y + 2.5 * dotSize}` +
