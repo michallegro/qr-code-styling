@@ -108,7 +108,8 @@ type                   | string (`'canvas' 'svg'`)  |`canvas` |The type of the e
 shape                  | string (`'square' 'circle')|`square` |The shape of the qr-code, circle shape adds rundom extra dots arround
 data                   | string                     |         |The data will be encoded to the QR code
 image                  | string                     |         |The image will be copied to the center of the QR code
-margin                 | number                     |`0`      |Margin around canvas
+exactSize              | boolean                    |`false`  |When `true`, the library will calculate dot/module sizes so the rendered QR code fits the exact `width`/`height` specified (by css upscale, which can result in a bit blurry image). When `false` the QR may have some extra whitespace around - as part of the image.
+margin                 | number or string (`'safe'`)|`0`      |Margin around canvas. Can be a number of pixels or the special value `"safe"` which will calculate the recommended 4 dot units of quiet zone (best used with `exactSize: true`).
 qrOptions              | object                     |         |Options will be passed to `qrcode-generator` lib
 imageOptions           | object                     |         |Specific image options, details see below
 dotsOptions            | object                     |         |Dots styling options
