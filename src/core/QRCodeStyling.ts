@@ -3,6 +3,7 @@ import mergeDeep from "../tools/merge";
 import downloadURI from "../tools/downloadURI";
 import QRSVG from "./QRSVG";
 import drawTypes from "../constants/drawTypes";
+import shapeTypes from "../constants/shapeTypes";
 
 import defaultOptions, { RequiredOptions } from "./QROptions";
 import sanitizeOptions from "../tools/sanitizeOptions";
@@ -59,14 +60,28 @@ export default class QRCodeStyling {
       return;
     }
 
+    let canvasWidth = this._options.width;
+    let canvasHeight = this._options.height;
+
+    if (this._options.exactSize) {
+      const count = this._qr.getModuleCount();
+      const minSize = Math.min(this._options.width, this._options.height) - this._options.margin * 2;
+      const realQRSize = this._options.shape === shapeTypes.circle ? minSize / Math.sqrt(2) : minSize;
+      const dotSize = this._options.dotsOptions.roundSize ? Math.floor(realQRSize / count) : (realQRSize / count);
+      const actualQRSize = dotSize * count;
+
+      canvasWidth = actualQRSize + this._options.margin * 2;
+      canvasHeight = actualQRSize + this._options.margin * 2;
+    }
+
     if (this._options.nodeCanvas?.createCanvas) {
-      this._nodeCanvas = this._options.nodeCanvas.createCanvas(this._options.width, this._options.height);
-      this._nodeCanvas.width = this._options.width;
-      this._nodeCanvas.height = this._options.height;
+      this._nodeCanvas = this._options.nodeCanvas.createCanvas(canvasWidth, canvasHeight);
+      this._nodeCanvas.width = canvasWidth;
+      this._nodeCanvas.height = canvasHeight;
     } else {
       this._domCanvas = document.createElement("canvas");
-      this._domCanvas.width = this._options.width;
-      this._domCanvas.height = this._options.height;
+      this._domCanvas.width = canvasWidth;
+      this._domCanvas.height = canvasHeight;
     }
 
     this._setupSvg();
@@ -148,14 +163,41 @@ export default class QRCodeStyling {
       throw "Container should be a single DOM node";
     }
 
+    let elementToAppend: HTMLElement | SVGElement | null = null;
+
     if (this._options.type === drawTypes.canvas) {
-      if (this._domCanvas) {
-        container.appendChild(this._domCanvas);
-      }
+      elementToAppend = this._domCanvas || null;
     } else {
-      if (this._svg) {
-        container.appendChild(this._svg);
+      elementToAppend = this._svg || null;
+    }
+
+    if (!elementToAppend) {
+      this._container = container;
+      return;
+    }
+
+    if (this._options.exactSize) {
+      // Create a wrapper div to maintain the desired size while allowing browser scaling
+      const wrapper = document.createElement('div');
+      wrapper.style.width = `${this._options.width}px`;
+      wrapper.style.height = `${this._options.height}px`;
+      wrapper.style.position = 'relative';
+      wrapper.style.overflow = 'hidden';
+
+      // Style the element to fill the wrapper and let browser handle scaling
+      if (this._options.type === drawTypes.canvas && this._domCanvas) {
+        this._domCanvas.style.width = '100%';
+        this._domCanvas.style.height = '100%';
+        this._domCanvas.style.objectFit = 'contain';
+      } else if (this._svg) {
+        this._svg.style.width = '100%';
+        this._svg.style.height = '100%';
       }
+
+      wrapper.appendChild(elementToAppend);
+      container.appendChild(wrapper);
+    } else {
+      container.appendChild(elementToAppend);
     }
 
     this._container = container;

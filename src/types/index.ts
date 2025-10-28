@@ -118,6 +118,7 @@ export type Options = {
   image?: string;
   nodeCanvas?: typeof nodeCanvas;
   jsdom?: typeof JSDOM;
+  exactSize?: boolean;
   qrOptions?: {
     typeNumber?: TypeNumber;
     mode?: Mode;
