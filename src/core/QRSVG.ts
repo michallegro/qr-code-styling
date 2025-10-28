@@ -1,6 +1,8 @@
 import calculateImageSize from "../tools/calculateImageSize";
 import toDataUrl from "../tools/toDataUrl";
 import errorCorrectionPercents from "../constants/errorCorrectionPercents";
+import resolveMargin from "../tools/resolveMargin";
+import calculateSizingParameters from "../tools/calculateSizingParameters";
 import QRDot from "../figures/dot/QRDot";
 import QRCornerSquare, { availableCornerSquareTypes } from "../figures/cornerSquare/QRCornerSquare";
 import QRCornerDot, { availableCornerDotTypes } from "../figures/cornerDot/QRCornerDot";
@@ -62,6 +64,10 @@ export default class QRSVG {
     this._imageUri = options.image;
     this._instanceId = QRSVG.instanceCount++;
     this._options = options;
+  }
+
+  _resolveMargin(): number {
+    return resolveMargin(this._options, this._qr);
   }
 
   get width(): number {
@@ -631,26 +637,12 @@ export default class QRSVG {
   };
 
   _getSizingParameters = (moduleCount: number) => {
-    const minSize = Math.min(this._options.width, this._options.height) - this._options.margin * 2;
-    const realQRSize = this._options.shape === shapeTypes.circle ? minSize / Math.sqrt(2) : minSize;
+    const sizing = calculateSizingParameters(this._options, this._qr!, {
+      roundSize: this._roundSize,
+      calculateOptimalDotSize: this._calculateOptimalDotSize
+    });
 
-    let dotSize: number;
-    let actualWidth: number;
-    let actualHeight: number;
-
-    if (this._options.exactSize) {
-      dotSize = this._calculateOptimalDotSize(realQRSize, moduleCount);
-      const actualQRSize = dotSize * moduleCount;
-      actualWidth = actualQRSize + this._options.margin * 2;
-      actualHeight = actualQRSize + this._options.margin * 2;
-    } else {
-      dotSize = this._roundSize(realQRSize / moduleCount);
-      actualWidth = this._options.width;
-      actualHeight = this._options.height;
-    }
-
-    const xBeginning = this._roundSize((actualWidth - moduleCount * dotSize) / 2);
-    const yBeginning = this._roundSize((actualHeight - moduleCount * dotSize) / 2);
+    const { dotSize, actualWidth, actualHeight, xBeginning, yBeginning } = sizing;
 
     return {
       dotSize,

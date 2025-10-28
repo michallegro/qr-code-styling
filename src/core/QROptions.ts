@@ -9,7 +9,7 @@ export interface RequiredOptions extends Options {
   shape: ShapeType;
   width: number;
   height: number;
-  margin: number;
+  margin: number | "safe";
   data: string;
   qrOptions: {
     typeNumber: TypeNumber;

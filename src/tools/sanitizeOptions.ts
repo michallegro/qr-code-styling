@@ -27,7 +27,11 @@ export default function sanitizeOptions(options: RequiredOptions): RequiredOptio
 
   newOptions.width = Number(newOptions.width);
   newOptions.height = Number(newOptions.height);
-  newOptions.margin = Number(newOptions.margin);
+
+  // Handle "safe" margin option - keep it as is, don't convert to number
+  if (newOptions.margin !== "safe") {
+    newOptions.margin = Number(newOptions.margin);
+  }
   newOptions.imageOptions = {
     ...newOptions.imageOptions,
     hideBackgroundDots: Boolean(newOptions.imageOptions.hideBackgroundDots),
@@ -35,7 +39,8 @@ export default function sanitizeOptions(options: RequiredOptions): RequiredOptio
     margin: Number(newOptions.imageOptions.margin)
   };
 
-  if (newOptions.margin > Math.min(newOptions.width, newOptions.height)) {
+  // Only validate numeric margins against width/height constraints
+  if (typeof newOptions.margin === "number" && newOptions.margin > Math.min(newOptions.width, newOptions.height)) {
     newOptions.margin = Math.min(newOptions.width, newOptions.height);
   }
 

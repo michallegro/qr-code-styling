@@ -113,7 +113,7 @@ export type Options = {
   shape?: ShapeType;
   width?: number;
   height?: number;
-  margin?: number;
+  margin?: number | "safe";
   data?: string;
   image?: string;
   nodeCanvas?: typeof nodeCanvas;

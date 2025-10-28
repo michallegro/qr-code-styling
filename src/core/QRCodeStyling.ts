@@ -1,9 +1,10 @@
 import getMode from "../tools/getMode";
 import mergeDeep from "../tools/merge";
 import downloadURI from "../tools/downloadURI";
+import resolveMargin from "../tools/resolveMargin";
+import calculateSizingParameters from "../tools/calculateSizingParameters";
 import QRSVG from "./QRSVG";
 import drawTypes from "../constants/drawTypes";
-import shapeTypes from "../constants/shapeTypes";
 
 import defaultOptions, { RequiredOptions } from "./QROptions";
 import sanitizeOptions from "../tools/sanitizeOptions";
@@ -42,6 +43,10 @@ export default class QRCodeStyling {
     }
   }
 
+  _resolveMargin(): number {
+    return resolveMargin(this._options, this._qr);
+  }
+
   _setupSvg(): void {
     if (!this._qr) {
       return;
@@ -64,14 +69,9 @@ export default class QRCodeStyling {
     let canvasHeight = this._options.height;
 
     if (this._options.exactSize) {
-      const count = this._qr.getModuleCount();
-      const minSize = Math.min(this._options.width, this._options.height) - this._options.margin * 2;
-      const realQRSize = this._options.shape === shapeTypes.circle ? minSize / Math.sqrt(2) : minSize;
-      const dotSize = this._options.dotsOptions.roundSize ? Math.floor(realQRSize / count) : (realQRSize / count);
-      const actualQRSize = dotSize * count;
-
-      canvasWidth = actualQRSize + this._options.margin * 2;
-      canvasHeight = actualQRSize + this._options.margin * 2;
+      const sizing = calculateSizingParameters(this._options, this._qr!);
+      canvasWidth = sizing.actualWidth;
+      canvasHeight = sizing.actualHeight;
     }
 
     if (this._options.nodeCanvas?.createCanvas) {

@@ -32,6 +32,10 @@
       flex-wrap: wrap;
     }
 
+    .description {
+      flex: 1;
+    }
+
     h3 {
       margin: 0 0 10px 0;
     }
@@ -81,7 +85,62 @@
     </div>
   </div>
 
-  <h2>Border extension</h2>
+  <hr />
+  <h1>QR Code Safe Margin Feature Demo</h1>
+
+  <h2>Standard Margin vs Safe Margin</h2>
+  <div class="comparison">
+    <div class="container">
+      <div id="qr-no-margin"></div>
+      <div class="description">
+        <strong>No Margin</strong><br>
+        <code>margin: 0</code><br>
+        May have scanning issues due to lack of quiet zone.
+      </div>
+    </div>
+
+    <div class="container">
+      <div id="qr-safe-margin"></div>
+      <div class="description">
+        <strong>Safe Margin</strong><br>
+        <code>margin: "safe"</code><br>
+        Automatically calculates 4 modules of quiet zone for optimal scanning.
+      </div>
+    </div>
+
+    <div class="container">
+      <div id="qr-fixed-margin"></div>
+      <div class="description">
+        <strong>Fixed Margin</strong><br>
+        <code>margin: 20</code><br>
+        Manual margin setting (may be too small or too large).
+      </div>
+    </div>
+  </div>
+
+  <h2>Different QR Code Sizes</h2>
+  <div class="comparison">
+    <div class="container">
+      <div id="qr-small-safe"></div>
+      <div class="description">
+        <strong>Small QR Code (150px)</strong><br>
+        <code>margin: "safe"</code><br>
+        Proportionally smaller quiet zone.
+      </div>
+    </div>
+
+    <div class="container">
+      <div id="qr-large-safe"></div>
+      <div class="description">
+        <strong>Large QR Code (400px)</strong><br>
+        <code>margin: "safe"</code><br>
+        Proportionally larger quiet zone.
+      </div>
+    </div>
+  </div>
+
+  <hr />
+  <h1>Border extension</h1>
     <div class="container">
       <div id="border-extension"></div>
     </div>
@@ -89,7 +148,7 @@
   </div>
 
   <script type="application/javascript" charset="utf-8">
-    const testOptions = {
+    const baseOptions = {
       width: 150,
       height: 150,
       data: "https://example.com/test-qr-code-with-longer-data",
@@ -104,31 +163,31 @@
     };
 
     const qrSvgStandard = new QRCodeStyling({
-      ...testOptions,
+      ...baseOptions,
       type: "svg",
       exactSize: false,
     });
 
     const qrSvgExact = new QRCodeStyling({
-      ...testOptions,
+      ...baseOptions,
       type: "svg",
       exactSize: true,
     });
 
     const qrCanvasStandard = new QRCodeStyling({
-      ...testOptions,
+      ...baseOptions,
       type: "canvas",
       exactSize: false,
     });
 
     const qrCanvasExact = new QRCodeStyling({
-      ...testOptions,
+      ...baseOptions,
       type: "canvas",
       exactSize: true,
     });
 
     const qrCanvasStandard300 = new QRCodeStyling({
-      ...testOptions,
+      ...baseOptions,
       type: "canvas",
       exactSize: false,
       data: "https://example.com/test-qr-code-with-longer-data",
@@ -137,7 +196,7 @@
     });
 
     const qrCanvasExact300 = new QRCodeStyling({
-      ...testOptions,
+      ...baseOptions,
       type: "canvas",
       exactSize: true,
       data: "https://example.com/test-qr-code-with-longer-data",
@@ -151,6 +210,48 @@
     qrCanvasExact.append(document.getElementById("canvas-exact-150"));
     qrCanvasStandard300.append(document.getElementById("canvas-standard-300"));
     qrCanvasExact300.append(document.getElementById("canvas-exact-300"));
+  </script>
+
+  <script type="application/javascript" charset="utf-8">
+    new QRCodeStyling({
+        ...baseOptions,
+        width: 200,
+        height: 200,
+        margin: 0,
+        exactSize: true,
+    }).append(document.getElementById("qr-no-margin"));
+
+    new QRCodeStyling({
+        ...baseOptions,
+        width: 200,
+        height: 200,
+        margin: "safe",
+        exactSize: true,
+    }).append(document.getElementById("qr-safe-margin"));
+
+    new QRCodeStyling({
+        ...baseOptions,
+        width: 200,
+        height: 200,
+        margin: 10,
+        exactSize: true,
+    }).append(document.getElementById("qr-fixed-margin"));
+
+    new QRCodeStyling({
+        ...baseOptions,
+        width: 150,
+        height: 150,
+        margin: "safe",
+        exactSize: true,
+    }).append(document.getElementById("qr-small-safe"));
+
+    new QRCodeStyling({
+        ...baseOptions,
+        width: 400,
+        height: 400,
+        margin: "safe",
+        exactSize: true,
+    }).append(document.getElementById("qr-large-safe"));
   </script>
 
   <script type="application/javascript" charset="utf-8">
